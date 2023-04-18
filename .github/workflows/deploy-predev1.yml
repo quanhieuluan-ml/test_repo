@@ -1,0 +1,22 @@
+name: Deploy pre-dev1
+on:
+  push:
+    branches:
+      - pre-dev1
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: log run
+        uses: ./.github/actions/update-deploy-status
+        with:
+          status: "deploying"
+      - name: Sleep for 10s
+        uses: juliangruber/sleep-action@v1
+        with:
+          time: 10s
