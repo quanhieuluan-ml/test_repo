@@ -1,0 +1,63 @@
+version: 2
+mergeable:
+  - when: pull_request.*
+    validate:
+      - do: title
+        and:
+          - or:
+              - must_include:
+                  regex: 'DWML-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'MLTL-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'MLSE-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'MQ-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'MLI-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'FA-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'MFI-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'INFRA-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'MM-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'MA-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'MW-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'DAF-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'SOS-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'DX-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'AUT-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'PF-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'DTOOL:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'AU-\d+:.+$'
+                  message: "Add your JIRA issue key"
+          - must_exclude:
+              regex: ^\[WIP\]
