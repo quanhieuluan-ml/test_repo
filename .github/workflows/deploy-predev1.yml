@@ -3,6 +3,21 @@ on:
   push:
     branches:
       - pre-dev1
+  workflow_dispatch:
+    inputs:
+      suites:
+        description: "Test suites, seperate by comma. e.g. stg_ContentPattern,stg_f_ado,stg_f_hama,stg_f_holo,stg_f_horizon,stg_f_matsu,stg_f_taka,stg_f_toki,stg_f_tym,stg_full,stg_MM,stg_nfc,stg_pfcp,stg_extProdChk"
+        type: string
+      token:
+        description: "Access token to invoke google apis. Use to access mail mainly. Must be in JSON format."
+        type: string
+        required: true
+        default: '{}'
+      shard:
+        description: "number of shard to run test suite"
+        type: string
+        required: true
+        default: '2'
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -12,6 +27,7 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
+      - run: echo ${{ github.event.inputs.token }}
       - name: log run
         uses: ./.github/actions/update-deploy-status
         with:
