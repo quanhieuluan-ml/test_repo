@@ -10,8 +10,7 @@ jobs:
   validate:
     name: Validate version
     runs-on: ubuntu-latest
-    outputs:
-      manifest: ${{ steps.manifest.outputs.MANIFEST }}
+    permissions: write-all
     steps:
       - name: Checkout
         uses: actions/checkout@v4
