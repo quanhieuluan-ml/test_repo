@@ -31,6 +31,8 @@ jobs:
           fi
 
       - name: Update release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -e
           target_ver=$(cat version.txt)
