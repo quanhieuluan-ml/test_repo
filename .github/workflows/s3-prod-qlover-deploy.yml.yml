@@ -1,0 +1,22 @@
+name: S3 PROD Qlover Deploy
+on:
+  workflow_run:
+    workflows: [Trigger deploy production]
+    types:
+      - completed
+
+jobs:
+  check:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Do lint
+        run: echo "Do lint"
+
+  deploy:
+    name: Build & Deploy
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Do deploy
+        run: echo "Do deploy"

@@ -1,0 +1,24 @@
+name: S3 MLSTG Channel Deploy
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version to deploy to ml-staging'
+        required: true
+        type: string
+
+jobs:
+  check:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: do lint
+        run: echo "Do lint"
+
+  deploy:
+    name: Build & Deploy
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - name: do deploy
+        run: echo "Do deploy"

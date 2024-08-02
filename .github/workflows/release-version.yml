@@ -1,0 +1,32 @@
+name: Version release
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Create release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: softprops/action-gh-release@v2
+        with:
+          prerelease: true
+          generate_release_notes: true
+  deploy-default:
+    needs: release
+    uses: ./.github/workflows/s3-mlstg-deploy.yml
+    with:
+      version: ${{ github.ref_name }}
+  deploy-qlover:
+    needs: release
+    uses: ./.github/workflows/s3-mlstg-qlover-deploy.yml
+    with:
+      version: ${{ github.ref_name }}
+  deploy-channel:
+    needs: release
+    uses: ./.github/workflows/s3-mlstg-channel-deploy.yml
+    with:
+      version: ${{ github.ref_name }}

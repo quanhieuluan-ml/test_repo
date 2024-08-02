@@ -1,0 +1,35 @@
+name: Trigger deploy production
+on:
+  push:
+    branches:
+      - production
+    paths:
+      - "version.txt"
+
+jobs:
+  check:
+    name: Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-tags: 'true'
+      - name: Valid version
+        run: |
+          set -e
+          target_ver=$(cat version.txt)
+          tag_hash=$(git rev-parse $target_ver)
+          last_commit_hash=$(git log -1 --pretty=%P)
+          if [ "$last_commit_hash" = "$tag_hash" ]; then
+            echo "Branch is valid and process deployment"
+          else
+            echo "This branch was not created correctly. Please recreate from right tag and try again."
+            exit 1
+          fi
+
+      - name: Update release
+        run: |
+          set -e
+          target_ver=$(cat version.txt)
+          gh release edit $target_ver --latest
