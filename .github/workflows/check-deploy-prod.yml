@@ -7,9 +7,11 @@ on:
       - "version.txt"
 
 jobs:
-  check:
-    name: Validation
+  validate:
+    name: Validate version
     runs-on: ubuntu-latest
+    outputs:
+      manifest: ${{ steps.manifest.outputs.MANIFEST }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,3 +35,19 @@ jobs:
           set -e
           target_ver=$(cat version.txt)
           gh release edit $target_ver --latest
+
+  deploy-default:
+    needs: validate
+    uses: ./.github/workflows/s3-prod-deploy.yml
+    with:
+      version: ${{ github.ref_name }}
+  deploy-qlover:
+    needs: validate
+    uses: ./.github/workflows/s3-prod-qlover-deploy.yml
+    with:
+      version: ${{ github.ref_name }}
+  deploy-channel:
+    needs: validate
+    uses: ./.github/workflows/s3-prod-channel-deploy.yml
+    with:
+      version: ${{ github.ref_name }}

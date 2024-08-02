@@ -1,9 +1,11 @@
 name: S3 PROD Deploy
 on:
-  workflow_run:
-    workflows: [Trigger deploy production]
-    types:
-      - completed
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version to deploy to production'
+        required: true
+        type: string
 
 jobs:
   check:
@@ -18,5 +20,9 @@ jobs:
     needs: check
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Do deploy
-        run: echo "Do deploy"
+        run: |
+          echo "Do deploy"
+          cat version.txt
