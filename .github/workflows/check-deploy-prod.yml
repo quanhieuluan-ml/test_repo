@@ -35,7 +35,7 @@ jobs:
         run: |
           set -e
           target_ver=$(cat version.txt)
-          gh release edit $target_ver --latest --prerelease=false
+          gh release edit $target_ver --latest --draft=false
 
   deploy-default:
     needs: validate
