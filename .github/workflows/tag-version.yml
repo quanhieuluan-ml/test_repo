@@ -21,3 +21,9 @@ jobs:
         run: |
           git tag ${{ github.event.inputs.version }}
           git push origin ${{ github.event.inputs.version }}
+
+  tag-release:
+    needs: tag-version
+    uses: ./.github/workflows/release-version.yml
+    with:
+      version: ${{ github.event.inputs.version }}
