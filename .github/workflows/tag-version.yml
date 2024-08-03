@@ -1,0 +1,21 @@
+name: Release version
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version name"
+        type: string
+        required: true
+
+jobs:
+  tag-version:
+    name: Tag version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: tag
+        run: |
+          git tag ${{ github.event.inputs.version }}
+          git push origin ${{ github.event.inputs.version }}
