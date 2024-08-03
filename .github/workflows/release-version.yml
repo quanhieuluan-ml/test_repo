@@ -20,11 +20,11 @@ jobs:
           previous_latest=$(gh release list --jq '.[] | select(.isLatest == true)' --json name,isLatest | jq -r '.name')
           release_note=$(gh api --method POST -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" \
             repos/${{ github.repository }}/releases/generate-notes -f "tag_name=${{ github.ref_name }}" -f "target_commitish=main" -f "previous_tag_name=$previous_latest" -q '.body')
-          echo "RELEASE_NOTE=$release_note" >> $GITHUB_ENV
+          echo $release_note > release_note.txt
       - uses: softprops/action-gh-release@v2
         with:
           draft: true
-          body: ${{ env.RELEASE_NOTE }}
+          body_path: release_note.txt
   deploy-default:
     needs: release
     uses: ./.github/workflows/s3-mlstg-deploy.yml
