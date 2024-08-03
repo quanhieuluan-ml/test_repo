@@ -16,7 +16,7 @@ jobs:
         run: |
           $previous_latest=$(gh release list --jq '.[] | select(.isLatest == true)' --json name,isLatest | jq -r '.name')
             gh api --method POST -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" \
-            /${{ github.repository }}/releases/generate-notes -f "tag_name=v20240802.9" -f "target_commitish=main" -f "previous_tag_name=$previous_latest"
+            repos/${{ github.repository }}/releases/generate-notes -f "tag_name=v20240802.9" -f "target_commitish=main" -f "previous_tag_name=$previous_latest"
           echo "PREV_TAG=$previous_latest" >> $GITHUB_ENV
       - uses: softprops/action-gh-release@v2
         with:
