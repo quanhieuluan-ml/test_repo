@@ -6,6 +6,10 @@ on:
         description: "Version name"
         type: string
         required: true
+      ticket:
+        description: "Ticket number of current task"
+        type: string
+        required: true
 
 jobs:
   tag-version:
@@ -18,11 +22,5 @@ jobs:
         uses: actions/checkout@v4
       - name: tag
         run: |
-          git tag ${{ github.event.inputs.version }}
-          git push origin ${{ github.event.inputs.version }}
-  tag-release:
-    needs: tag-version
-    permissions: write-all
-    uses: ./.github/workflows/release-version.yml
-    with:
-      version: ${{ github.event.inputs.version }}
+          git tag ${{ inputs.version }}
+          git push origin ${{ inputs.version }}
