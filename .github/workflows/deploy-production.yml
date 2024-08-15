@@ -22,11 +22,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh release edit ${{ inputs.version }} --latest --draft=false --prerelease=false
 
-  deploy-sheeta:
-    needs: validate
-    uses: ./.github/workflows/s3-prod-deploy.yml
-    with:
-      version: ${{ inputs.version }}
   deploy-qlover:
     needs: validate
     uses: ./.github/workflows/s3-prod-qlover-deploy.yml
