@@ -1,0 +1,39 @@
+name: Trigger deploy production
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to deploy to production"
+        required: true
+        type: string
+
+jobs:
+  validate:
+    name: Validate version
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
+      - name: Update release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit ${{ inputs.version }} --latest --draft=false
+
+  deploy-sheeta:
+    needs: validate
+    uses: ./.github/workflows/s3-prod-deploy.yml
+    with:
+      version: ${{ inputs.version }}
+  deploy-qlover:
+    needs: validate
+    uses: ./.github/workflows/s3-prod-qlover-deploy.yml
+    with:
+      version: ${{ inputs.version }}
+  deploy-channel:
+    needs: validate
+    uses: ./.github/workflows/s3-prod-channel-deploy.yml
+    with:
+      version: ${{ inputs.version }}
