@@ -28,18 +28,3 @@ jobs:
           set -e
           previous_latest=$(gh release list --jq '.[] | select(.isLatest == true)' --json name,isLatest | jq -r '.name')
           gh release create --draft --generate-notes --notes-start-tag $previous_latest ${{ inputs.version || github.ref_name }}
-  deploy-default:
-    needs: release
-    uses: ./.github/workflows/s3-mlstg-deploy.yml
-    with:
-      version: ${{ inputs.version || github.ref_name }}
-  deploy-qlover:
-    needs: release
-    uses: ./.github/workflows/s3-mlstg-qlover-deploy.yml
-    with:
-      version: ${{ inputs.version || github.ref_name }}
-  deploy-channel:
-    needs: release
-    uses: ./.github/workflows/s3-mlstg-channel-deploy.yml
-    with:
-      version: ${{ inputs.version || github.ref_name }}
