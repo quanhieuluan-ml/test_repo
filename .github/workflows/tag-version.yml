@@ -6,10 +6,6 @@ on:
         description: "Version name"
         type: string
         required: true
-      ticket:
-        description: "Ticket number of current task"
-        type: string
-        required: true
 
 jobs:
   tag-version:
