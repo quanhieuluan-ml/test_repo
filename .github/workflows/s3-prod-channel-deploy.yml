@@ -17,6 +17,8 @@ jobs:
 
   deploy:
     name: Build & Deploy
+    environment:
+      name: production
     needs: check
     runs-on: ubuntu-latest
     steps:
