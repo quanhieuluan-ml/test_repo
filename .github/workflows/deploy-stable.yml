@@ -1,0 +1,22 @@
+name: Trigger deploy stable
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy to stable'
+        required: true
+        type: string
+
+jobs:
+  deploy-sheeta:
+    uses: ./.github/workflows/s3-stable-deploy.yml
+    with:
+      version: ${{ inputs.version }}
+  deploy-qlover:
+    uses: ./.github/workflows/s3-stable-qlover-deploy.yml
+    with:
+      version: ${{ inputs.version }}
+  deploy-channel:
+    uses: ./.github/workflows/s3-stable-channel-deploy.yml
+    with:
+      version: ${{ inputs.version }}
