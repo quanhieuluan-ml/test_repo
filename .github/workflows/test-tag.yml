@@ -1,0 +1,17 @@
+name: Tag version
+on:
+  create:
+    branches:
+      - v[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]
+
+jobs:
+  test-tag:
+    name: Test tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: paulhatch/semantic-version@v5.4.0
+        with:
+          tag_prefix: "v"
+          version_format: "${{github.ref_name}}${increment}"
