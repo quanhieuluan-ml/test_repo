@@ -15,5 +15,5 @@ jobs:
         uses: actions/checkout@v4
       - name: tag
         run: |
-          git tag ${{github.ref_name}}
-          git push origin ${{github.ref_name}}
+          git tag ${{github.ref_name}}.0
+          git push origin ${{github.ref_name}}.0
