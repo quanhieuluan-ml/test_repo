@@ -1,16 +1,17 @@
-name: Tag version
+name: Initialize release version
 on:
   create:
     branches:
       - v[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]
 
 jobs:
-  test-tag:
-    name: Test tag
+  tag-version:
+    name: Tag version
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: paulhatch/semantic-version@v5.4.0
-        with:
-          version_from_branch: "/v([0-9]+.[0-9]+$|[0-9]+)$/"
+      - name: tag
+        run: |
+          git tag ${{github.ref_name}}
+          git push origin ${{github.ref_name}}
