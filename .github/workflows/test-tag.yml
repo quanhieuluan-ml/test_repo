@@ -14,4 +14,4 @@ jobs:
       - uses: paulhatch/semantic-version@v5.4.0
         with:
           tag_prefix: "v"
-          version_format: "${{github.ref_name}}${increment}"
+          version_format: "${{github.ref_name}}.${increment}"
