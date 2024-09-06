@@ -17,8 +17,7 @@ jobs:
       - uses: paulhatch/semantic-version@v5.4.0
         id: version
         with:
-          tag_prefix: "v"
-          version_format: "${major}"
+          version_format: "v${major}"
           bump_each_commit: true
           version_from_branch: "/v[0-9]+$/"
       - name: tag
