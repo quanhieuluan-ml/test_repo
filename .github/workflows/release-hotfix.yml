@@ -18,8 +18,7 @@ jobs:
         id: version
         with:
           version_format: "${major}.${minor}"
-          bump_each_commit: true
-          minor_pattern: "/.*/"
+          minor_pattern: "(jofen)"
           version_from_branch: "/v([0-9]+)$/"
       - name: tag
         env:
