@@ -24,3 +24,4 @@ jobs:
           echo ${{ steps.version.outputs.version_type }}
           git tag ${{ steps.version.outputs.version }}
           git push origin ${{ steps.version.outputs.version }}
+          gh release create --generate-notes --notes-start-tag ${{ steps.version.outputs.previous_version }} ${{ steps.version.outputs.version }}
