@@ -5,8 +5,20 @@ on:
       - v[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]
 
 jobs:
+  init-version:
+    if: github.event.push.created == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: tag
+        run: |
+          git tag ${{github.ref_name}}.0
+          git push origin ${{github.ref_name}}.0
   tag-version:
-    name: Tag version
+    if: github.event.push.created == false
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
