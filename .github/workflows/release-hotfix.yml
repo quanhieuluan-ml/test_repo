@@ -19,7 +19,7 @@ jobs:
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
         with:
           fallback: ${{github.ref_name}}.
-          prefix: "v${{github.ref_name}}"
+          prefix: ${{github.ref_name}}
       - name: Create next version
         env:
           VERSION: ${{ steps.previoustag.outputs.tag }}
