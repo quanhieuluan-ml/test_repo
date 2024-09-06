@@ -6,23 +6,18 @@ on:
 
 jobs:
   init-version:
-    if: github.event.push.created == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - uses: paulhatch/semantic-version@v5.4.0
+        id: version
+        with:
+          version_format: "${major}.${increment}"
+          version_from_branch: "/v([0-9]+.[0-9]+$|[0-9]+)$/"
       - name: tag
         run: |
-          git tag ${{github.ref_name}}.0
-          git push origin ${{github.ref_name}}.0
-  tag-version:
-    if: github.event.push.created == false
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - uses: paulhatch/semantic-version@v5.4.0
-        with:
-          version_from_branch: "/v([0-9]+.[0-9]+$|[0-9]+)$/"
+          git tag ${{ steps.version.outputs.version }}
+          git push origin ${{ steps.version.outputs.version }}
