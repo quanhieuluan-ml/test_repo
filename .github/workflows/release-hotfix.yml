@@ -23,12 +23,16 @@ jobs:
       - name: Create next version
         env:
           VERSION: ${{ steps.previoustag.outputs.tag }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           previous_i=${VERSION#*.}
           if [ -z "$previous_i" ]; then
             next_i=0
+            compare_target=$(gh release list --jq '.[] | select(.isLatest == true)' --json name,isLatest | jq -r '.name')
           else
             next_i=$((previous_i + 1))
+            compare_target=$VERSION
           fi
           git tag "${{github.ref_name}}.$next_i"
           git push origin "${{github.ref_name}}.$next_i"
+          gh release create --prerelease --generate-notes --notes-start-tag $compare_target "${{github.ref_name}}.$next_i"
