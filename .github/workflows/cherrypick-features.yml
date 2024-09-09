@@ -6,11 +6,13 @@ on:
         description: "The target branch which prs will be merge into."
         required: true
         type: string
-      prs:
-        description: "PRs to cherry pick. Seperate by comma."
+      pr:
+        description: "PR to cherry pick."
         required: true
         type: string
-
+permissions:
+  contents: write # so it can comment
+  pull-requests: write # so it can create pull requests
 jobs:
   validate:
     name: cherry pick features
@@ -19,14 +21,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Update release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          UPSTREAM_REMOTE: origin
-          GITHUB_USER: ${{ github.repository_owner }}
-          MAIN_REPO_ORG: ${{ github.repository_owner }}
-          MAIN_REPO_NAME: ${{ github.event.repository.name }}
-        run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-          ./.github/scripts/cherry-pick-pull.sh origin/${{ github.event.inputs.branch }} ${{ github.event.inputs.prs }}
+      - name: Create backport pull requests
+        uses: korthout/backport-action@v3
+        with:
+          source_pr_number: ${{ github.event.inputs.pr }}
+          target_branches: ${{ github.event.inputs.branch }}
