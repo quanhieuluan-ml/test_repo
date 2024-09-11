@@ -39,6 +39,6 @@ jobs:
             next_i=$((previous_i + 1))
             compare_target=$VERSION
           fi
-          git tag "$THIS_VERSION.$next_i"
-          git push origin "$THIS_VERSION.$next_i"
-          gh release create --prerelease --generate-notes --notes-start-tag $compare_target "$THIS_VERSION.$next_i"
+          git tag "v$THIS_VERSION.$next_i"
+          git push origin "v$THIS_VERSION.$next_i"
+          gh release create --prerelease --generate-notes --notes-start-tag $compare_target "v$THIS_VERSION.$next_i"
