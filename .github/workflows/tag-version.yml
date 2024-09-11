@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Get this version
-        run: echo "THIS_VERSION=${GITHUB_REF_NAME#"release-"}" >> $GITHUB_ENV
+        run: echo "THIS_VERSION=v${GITHUB_REF_NAME#"release-"}" >> $GITHUB_ENV
       - name: Get Previous tag
         id: previoustag
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
@@ -39,6 +39,6 @@ jobs:
             next_i=$((previous_i + 1))
             compare_target=$VERSION
           fi
-          git tag "v$THIS_VERSION.$next_i"
-          git push origin "v$THIS_VERSION.$next_i"
-          gh release create --prerelease --generate-notes --notes-start-tag $compare_target "v$THIS_VERSION.$next_i"
+          git tag "$THIS_VERSION.$next_i"
+          git push origin "$THIS_VERSION.$next_i"
+          gh release create --prerelease --generate-notes --notes-start-tag $compare_target "$THIS_VERSION.$next_i"
