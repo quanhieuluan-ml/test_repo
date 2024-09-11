@@ -32,6 +32,9 @@ jobs:
           if [ -z "$previous_i" ]; then
             next_i=0
             compare_target=$(gh release list --jq '.[] | select(.isLatest == true)' --json name,isLatest | jq -r '.name')
+            if [ -z "$compare_target" ]; then
+              compare_target=$(git describe --tags --abbrev=0)
+            fi
           else
             next_i=$((previous_i + 1))
             compare_target=$VERSION
