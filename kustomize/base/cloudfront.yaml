@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudfront-config
+data:
+  CLOUDFRONT_AUTOCONFIG: "false"
+  CLOUDFRONT_REGION: ""
