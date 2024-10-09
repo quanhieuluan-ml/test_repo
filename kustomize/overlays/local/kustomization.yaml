@@ -5,6 +5,6 @@ namespace: nfc-deploytool
 resources:
   - ../../base
 
-patches:
+patchesStrategicMerge:
   - path: cloudfront.yaml
   - path: s3.yaml
