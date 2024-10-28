@@ -15,5 +15,5 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: nginx:1.18
+        - image: nginx
           name: proxy
