@@ -8,4 +8,4 @@ patchesStrategicMerge:
 - s3.yaml
 images:
 - name: nginx
-  newTag: 1.18
+  newTag: "1.18"
