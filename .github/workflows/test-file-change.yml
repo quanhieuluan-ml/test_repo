@@ -21,7 +21,7 @@ jobs:
           CONTENT="newTag:"
 
           # Compare the file between HEAD and the previous commit
-          if git diff HEAD^ HEAD -- "$FILE" | grep -q "$CONTENT"; then
+          if git diff ${{ github.event.before }} ${{ github.event.after }} -- "$FILE" | grep -q "$CONTENT"; then
             echo "Content has changed"
             git diff HEAD^ HEAD -- "$FILE" | grep -q "$CONTENT" 
             echo "has_changed=true" >> $GITHUB_ENV
