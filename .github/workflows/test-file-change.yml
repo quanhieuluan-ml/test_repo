@@ -1,0 +1,39 @@
+name: Check File Changes
+
+on:
+  push:
+    branches:
+      - test-file-change  # Adjust to your branch of interest
+
+jobs:
+  check-file-content:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for specific content in a file
+        id: check-content
+        run: |
+          # Specify the file and content
+          FILE="kustomize/overlays/staging/kustomization.yaml"
+          CONTENT="newTag:"
+
+          # Compare the file between HEAD and the previous commit
+          if git diff HEAD^ HEAD -- "$FILE" | grep -q "$CONTENT"; then
+            echo "Content has changed"
+            git diff HEAD^ HEAD -- "$FILE" | grep -q "$CONTENT" 
+            echo "has_changed=true" >> $GITHUB_ENV
+          else
+            echo "Content has NOT changed"
+            echo "has_changed=false" >> $GITHUB_ENV
+          fi
+
+      - name: Use the result
+        run: |
+          if [ "$has_changed" = "true" ]; then
+            echo "Performing actions for changed content..."
+          else
+            echo "No relevant changes detected."
+          fi
