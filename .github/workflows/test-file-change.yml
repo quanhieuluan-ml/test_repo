@@ -1,39 +1,70 @@
-name: Check File Changes
-
+name: release branch
 on:
   push:
     branches:
-      - test-file-change  # Adjust to your branch of interest
+      - release-[0-9]+.[0-9]+
 
 jobs:
-  check-file-content:
+  create-version:
     runs-on: ubuntu-latest
-
+    outputs:
+      imageChanged: ${{ steps.imageVersion.outputs.hasChanged }}
+      changedTag: ${{ steps.imageVersion.outputs.version }}
+    permissions:
+      contents: write
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Check for specific content in a file
-        id: check-content
+        with:
+          fetch-depth: 0
+      - name: Get this version
+        run: echo "THIS_VERSION=v${GITHUB_REF_NAME#"release-"}" >> $GITHUB_ENV
+      - name: Get Previous tag
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        with:
+          fallback: ${{ env.THIS_VERSION }}.
+          prefix: ${{env.THIS_VERSION}}
+      - name: Create next version
+        id: createversion
+        env:
+          VERSION: ${{ steps.previoustag.outputs.tag }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          # Specify the file and content
-          FILE="kustomize/overlays/staging/kustomization.yaml"
+          previous_i=$(echo $VERSION | cut -d'.' -f3)
+          if [ -z "$previous_i" ]; then
+            next_i=0
+            compare_target=$(gh release list --jq '.[] | select(.isLatest == true)' --json name,isLatest | jq -r '.name')
+            if [ -z "$compare_target" ]; then
+              compare_target=$(git describe --tags --abbrev=0)
+            fi
+          else
+            next_i=$((previous_i + 1))
+            compare_target=$VERSION
+          fi
+          git tag "$THIS_VERSION.$next_i"
+          git push origin "$THIS_VERSION.$next_i"
+          gh release create --prerelease --generate-notes --notes-start-tag $compare_target "$THIS_VERSION.$next_i"
+      - name: Check image version changed
+        id: imageVersion
+        run: |
+          FILE="deployments/kustomize/overlays/staging/kustomization.yaml"
           CONTENT="newTag:"
-
           # Compare the file between HEAD and the previous commit
-          if git diff ${{ github.event.before }} ${{ github.event.after }} -- "$FILE" | grep -q "$CONTENT"; then
-            echo "Content has changed"
-            git diff HEAD^ HEAD -- "$FILE" | grep -q "$CONTENT" 
-            echo "has_changed=true" >> $GITHUB_ENV
+          OLD_TAG=$(git show HEAD^:"$FILE" | yq '.images[] | select(.name == "lsm").newTag')
+          NEW_TAG=$(yq '.images[] | select(.name == "lsm").newTag' $FILE)
+          if [ "$OLD_TAG" != "$NEW_TAG" ]; then
+            echo "Image tag has changed"
+            echo "hasChanged=true" >> $GITHUB_OUTPUT
+            echo "version=$NEW_TAG" >> $GITHUB_OUTPUT
           else
-            echo "Content has NOT changed"
-            echo "has_changed=false" >> $GITHUB_ENV
+            echo "Image tag has NOT changed"
+            echo "hasChanged=false" >> $GITHUB_OUTPUT
           fi
-
-      - name: Use the result
-        run: |
-          if [ "$has_changed" = "true" ]; then
-            echo "Performing actions for changed content..."
-          else
-            echo "No relevant changes detected."
-          fi
+  build:
+    permissions: write-all
+    needs: create-version
+    if: needs.create-version.outputs.imageChanged == 'true'
+    uses: ./.github/workflows/build-release-image.yml
+    with:
+      version: ${{ needs.create-version.outputs.changedTag }}
