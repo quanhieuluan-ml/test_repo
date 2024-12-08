@@ -1,0 +1,17 @@
+name: Build lsm image
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: "Which application version"
+        required: false
+        type: string
+        default: main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print image tag
+        run: |
+          echo ${{ inputs.ref }}
