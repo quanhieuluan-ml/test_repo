@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - release-[0-9]+.[0-9]+
+    branches-ignore:
+      - '**deleted**' # Prevent running on branch deletion
 
 jobs:
   create-version:
@@ -47,11 +49,16 @@ jobs:
           gh release create --prerelease --generate-notes --notes-start-tag $compare_target "$THIS_VERSION.$next_i"
       - name: Check image version changed
         id: imageVersion
+        env:
+          BRANCH_CREATED: ${{ github.event.created }}
         run: |
           FILE="deployments/kustomize/overlays/staging/kustomization.yaml"
-          CONTENT="newTag:"
           # Compare the file between HEAD and the previous commit
           OLD_TAG=$(git show HEAD^:"$FILE" | yq '.images[] | select(.name == "lsm").newTag')
+          if [ $BRANCH_CREATED == 'main' ]; then
+            lastTag=$(git describe --tags --abbrev=0)
+            OLD_TAG=$(git show $lastTag:"$FILE" | yq '.images[] | select(.name == "lsm").newTag')
+          fi
           NEW_TAG=$(yq '.images[] | select(.name == "lsm").newTag' $FILE)
           if [ "$OLD_TAG" != "$NEW_TAG" ]; then
             echo "Image tag has changed"
