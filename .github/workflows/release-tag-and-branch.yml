@@ -70,6 +70,7 @@ jobs:
     permissions: write-all
     needs: create-version
     if: needs.create-version.outputs.imageChanged == 'true'
+    secrets: inherit
     uses: ./.github/workflows/build-release-image.yml
     with:
       version: ${{ needs.create-version.outputs.changedTag }}
