@@ -25,26 +25,6 @@ jobs:
         with:
           fallback: ${{ env.THIS_VERSION }}.
           prefix: ${{env.THIS_VERSION}}
-      - name: Create next version
-        id: createversion
-        env:
-          VERSION: ${{ steps.previoustag.outputs.tag }}
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          previous_i=$(echo $VERSION | cut -d'.' -f3)
-          if [ -z "$previous_i" ]; then
-            next_i=0
-            compare_target=$(gh release list --jq '.[] | select(.isLatest == true)' --json name,isLatest | jq -r '.name')
-            if [ -z "$compare_target" ]; then
-              compare_target=$(git describe --tags --abbrev=0)
-            fi
-          else
-            next_i=$((previous_i + 1))
-            compare_target=$VERSION
-          fi
-          git tag "$THIS_VERSION.$next_i"
-          git push origin "$THIS_VERSION.$next_i"
-          gh release create --prerelease --generate-notes --notes-start-tag $compare_target "$THIS_VERSION.$next_i"
       - name: Check image version changed
         id: imageVersion
         env:
@@ -69,6 +49,26 @@ jobs:
             echo "Image tag has NOT changed"
             echo "hasChanged=false" >> $GITHUB_OUTPUT
           fi
+      - name: Create next version
+        id: createversion
+        env:
+          VERSION: ${{ steps.previoustag.outputs.tag }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          previous_i=$(echo $VERSION | cut -d'.' -f3)
+          if [ -z "$previous_i" ]; then
+            next_i=0
+            compare_target=$(gh release list --jq '.[] | select(.isLatest == true)' --json name,isLatest | jq -r '.name')
+            if [ -z "$compare_target" ]; then
+              compare_target=$(git describe --tags --abbrev=0)
+            fi
+          else
+            next_i=$((previous_i + 1))
+            compare_target=$VERSION
+          fi
+          git tag "$THIS_VERSION.$next_i"
+          git push origin "$THIS_VERSION.$next_i"
+          gh release create --prerelease --generate-notes --notes-start-tag $compare_target "$THIS_VERSION.$next_i"
   build:
     permissions: write-all
     needs: create-version
