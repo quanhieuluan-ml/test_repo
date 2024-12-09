@@ -53,7 +53,7 @@ jobs:
           FILE="deployments/kustomize/overlays/staging/kustomization.yaml"
           # Compare the file between HEAD and the previous commit
           OLD_TAG=$(git show HEAD^:"$FILE" | yq '.images[] | select(.name == "lsm").newTag')
-          if [ $BRANCH_CREATED == 'main' ]; then
+          if [ $BRANCH_CREATED == 'true' ]; then
             lastTag=$(git describe --tags --abbrev=0)
             OLD_TAG=$(git show $lastTag:"$FILE" | yq '.images[] | select(.name == "lsm").newTag')
           fi
