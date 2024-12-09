@@ -56,7 +56,9 @@ jobs:
           echo "BRANCH_CREATED: $BRANCH_CREATED"
           if [ $BRANCH_CREATED == 'true' ]; then
             lastTag=$(git describe --tags --abbrev=0)
+            echo "lastTag: $lastTag"
             OLD_TAG=$(git show $lastTag:"$FILE" | yq '.images[] | select(.name == "lsm").newTag')
+            echo "OLD_TAG: $OLD_TAG"
           fi
           NEW_TAG=$(yq '.images[] | select(.name == "lsm").newTag' $FILE)
           if [ "$OLD_TAG" != "$NEW_TAG" ]; then
