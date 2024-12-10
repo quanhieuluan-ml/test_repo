@@ -1,0 +1,59 @@
+name: Update only app version to the latest release version
+on:
+  workflow_dispatch:
+    inputs:
+      app-version:
+        description: App version to be updated(ex. v<major>.<minor>.<patch>)
+        required: true
+        type: string
+      ticket-number:
+        description: Ticket number to be updated(ex. DX-1234)
+        required: true
+        type: string
+permissions:
+  contents: write
+jobs:
+  build:
+    permissions: write-all
+    secrets: inherit
+    uses: ./.github/workflows/build-release-image.yml
+    with:
+      version: ${{ inputs.app-version }}
+  update-version:
+    name: Update app version
+    permissions: write-all
+    runs-on: ubuntu-latest
+    env:
+      APP_VERSION: ${{ github.event.inputs.app-version }}
+      TICKET_NUMBER: ${{ github.event.inputs.ticket-number }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Update all image tag version
+        run: |
+          yq -i '.images |= map(select(.name == "lsm").newTag |= "${{ env.APP_VERSION }}")'  \
+            deployments/kustomize/overlays/staging/kustomization.yaml  
+      - name: Find the latest release tag and branch
+        id: release-tag
+        run: |
+          RELEASE_TAG=$(git describe --tags --abbrev=0)
+          echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_OUTPUT
+          echo "RELEASE_BRANCH=release-${RELEASE_TAG:1:3}" >> $GITHUB_OUTPUT
+      - name: Commit and push
+        id: commit
+        uses: EndBug/add-and-commit@v9
+        with:
+          new_branch: ${{ env.TICKET_NUMBER }}_app_${{ env.APP_VERSION }}
+          message: "feat: ${{ env.TICKET_NUMBER }} deploy app ${{ env.APP_VERSION }}"
+          add: "deployments/kustomize/overlays/*"
+      - name: Create PRs to main and release branch
+        env:
+            GH_TOKEN: ${{ github.token }}
+        run: |
+          HEAD="${{ env.TICKET_NUMBER }}_app_${{ env.APP_VERSION }}"
+          PR_TITLE="${{ env.TICKET_NUMBER }}: update app version ${{ env.APP_VERSION }}"
+          PR_BODY="Application version up to ${{ env.APP_VERSION }}."
+          gh pr create --base main --head $HEAD --title "$PR_TITLE" --body "$PR_BODY"
+          gh pr create --base ${{ steps.release-tag.outputs.RELEASE_BRANCH }} --head $HEAD --title "$PR_TITLE" --body "$PR_BODY"
