@@ -48,6 +48,8 @@ jobs:
           message: "feat: ${{ env.TICKET_NUMBER }} deploy app ${{ env.APP_VERSION }}"
           add: "deployments/kustomize/overlays/*"
       - name: Create PRs to main and release branch
+        env:
+            GH_TOKEN: ${{ github.token }}
         run: |
           HEAD="$TICKET_NUMBER_app_$env.APP_VERSION"
           PR_TITLE="$TICKET_NUMBER: update app version $APP_VERSION"
