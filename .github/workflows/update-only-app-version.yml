@@ -21,6 +21,7 @@ jobs:
       version: ${{ inputs.app-version }}
   update-version:
     name: Update app version
+    permissions: write-all
     runs-on: ubuntu-latest
     env:
       APP_VERSION: ${{ github.event.inputs.app-version }}
