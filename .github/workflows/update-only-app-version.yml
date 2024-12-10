@@ -33,9 +33,7 @@ jobs:
       - name: Update all image tag version
         run: |
           sed -i -r 's/(v[0-9]{8}.[0-9])/${{ env.APP_VERSION }}/g' \
-            deployments/kustomize/overlays/staging/kustomization.yaml \
-            deployments/kustomize/overlays/production/kustomization.yaml \
-            deployments/kustomize/overlays/stable/kustomization.yaml
+            deployments/kustomize/overlays/staging/kustomization.yaml
       - name: Find the latest release tag and branch
         id: release-tag
         run: |
