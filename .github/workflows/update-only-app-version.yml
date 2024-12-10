@@ -45,7 +45,7 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           message: "feat: ${{ env.TICKET_NUMBER }} deploy app ${{ env.APP_VERSION }}"
-          add: "build/kustomize/overlays/*"
+          add: "deployments/kustomize/overlays/*"
       - name: Cherry-pick commit to latest branch
         run: |
           git checkout ${{ steps.release-tag.outputs.RELEASE_BRANCH }}
