@@ -52,8 +52,8 @@ jobs:
         env:
             GH_TOKEN: ${{ github.token }}
         run: |
-          HEAD="$TICKET_NUMBER_app_$APP_VERSION"
-          PR_TITLE="$TICKET_NUMBER: update app version $APP_VERSION"
-          PR_BODY="Application version up to $APP_VERSION."
+          HEAD="${{ env.TICKET_NUMBER }}_app_${{ env.APP_VERSION }}"
+          PR_TITLE="${{ env.TICKET_NUMBER }}: update app version ${{ env.APP_VERSION }}"
+          PR_BODY="Application version up to ${{ env.APP_VERSION }}."
           gh pr create --base main --head $HEAD --title "$PR_TITLE" --body "$PR_BODY"
           gh pr create --base ${{ steps.release-tag.outputs.RELEASE_BRANCH }} --head $HEAD --title "$PR_TITLE" --body "$PR_BODY"
