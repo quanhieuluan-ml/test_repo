@@ -44,10 +44,13 @@ jobs:
         id: commit
         uses: EndBug/add-and-commit@v9
         with:
+          new_branch: ${{ env.TICKET_NUMBER }}_app_${{ env.APP_VERSION }}
           message: "feat: ${{ env.TICKET_NUMBER }} deploy app ${{ env.APP_VERSION }}"
           add: "deployments/kustomize/overlays/*"
-      - name: Cherry-pick commit to latest branch
+      - name: Create PRs to main and release branch
         run: |
-          git checkout ${{ steps.release-tag.outputs.RELEASE_BRANCH }}
-          git cherry-pick ${{ steps.commit.outputs.commit_sha }}
-          git push origin ${{ steps.release-tag.outputs.RELEASE_BRANCH }}
+          HEAD="$TICKET_NUMBER_app_$env.APP_VERSION"
+          PR_TITLE="$TICKET_NUMBER: update app version $APP_VERSION"
+          PR_BODY="Application version up to $APP_VERSION."
+          gh pr create --base main --head $HEAD --title "$PR_TITLE" --body "$PR_BODY"
+          gh pr create --base ${{ steps.release-tag.outputs.RELEASE_BRANCH }} --head $HEAD --title "$PR_TITLE" --body "$PR_BODY"
