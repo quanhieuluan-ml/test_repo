@@ -4,4 +4,4 @@ namespace: lsm
 images:
   - name: lsm
     newName: 123.dkr.ecr.ap-northeast-1.amazonaws.com/stg-api-server
-    newTag: v1.5.2
+    newTag: v1.5.3
