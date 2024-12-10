@@ -52,7 +52,7 @@ jobs:
         env:
             GH_TOKEN: ${{ github.token }}
         run: |
-          HEAD="$TICKET_NUMBER_app_$env.APP_VERSION"
+          HEAD="$TICKET_NUMBER_app_$APP_VERSION"
           PR_TITLE="$TICKET_NUMBER: update app version $APP_VERSION"
           PR_BODY="Application version up to $APP_VERSION."
           gh pr create --base main --head $HEAD --title "$PR_TITLE" --body "$PR_BODY"
