@@ -1,4 +1,4 @@
-name: Update only app version to the latest version
+name: Update only app version to the latest release version
 on:
   workflow_dispatch:
     inputs:
@@ -15,6 +15,7 @@ permissions:
 jobs:
   build:
     permissions: write-all
+    secrets: inherit
     uses: ./.github/workflows/build-release-image.yml
     with:
       version: ${{ inputs.app-version }}
@@ -52,33 +53,3 @@ jobs:
           git checkout ${{ steps.release-tag.outputs.RELEASE_BRANCH }}
           git cherry-pick ${{ steps.commit.outputs.commit_sha }}
           git push origin ${{ steps.release-tag.outputs.RELEASE_BRANCH }}
-      - name: Parse semver
-        id: semver-parser
-        env:
-          RELEASE_TAG: ${{ steps.release-tag.outputs.RELEASE_TAG }}
-        run: |
-          echo "major=$(echo $RELEASE_TAG | cut -d'.' -f1)" >> $GITHUB_OUTPUT
-          echo "minor=$(echo $RELEASE_TAG | cut -d'.' -f2)" >> $GITHUB_OUTPUT
-          echo "patch=$(echo $RELEASE_TAG | cut -d'.' -f3)" >> $GITHUB_OUTPUT
-      - name: Create next version
-        id: createversion
-        env:
-          MAJOR: ${{ steps.semver-parser.outputs.major }}
-          MINOR: ${{ steps.semver-parser.outputs.minor }}
-          PATCH: ${{ steps.semver-parser.outputs.patch }}
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          PATCH=$((PATCH + 1))
-          new_version="$MAJOR.$MINOR.$PATCH"
-          git tag "$new_version"
-          git push origin "$new_version"
-          echo released $new_version
-          echo "NEW_VERSION=$new_version" >> $GITHUB_OUTPUT
-      - name: Create Release
-        id: create-release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.createversion.outputs.NEW_VERSION }}
-          generate_release_notes: true
-          draft: false
-          prerelease: true
