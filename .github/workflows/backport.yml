@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        branch: [pre-dev1 pre-dev2]
+        branch: [pre-dev1, pre-dev2]
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v4
