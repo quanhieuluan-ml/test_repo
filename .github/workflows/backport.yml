@@ -1,0 +1,41 @@
+name: Rebase pre-dev branches
+
+on:
+  workflow_dispatch:
+
+jobs:
+  rebase:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: [pre-dev1 pre-dev2]
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Fetch all branches
+        run: |
+          git fetch --all
+
+      - name: Checkout target branch
+        run: |
+          git checkout ${{ matrix.branch }}
+
+      - name: Rebase onto main
+        run: |
+          git rebase main
+
+      - name: Push updated branch
+        run: |
+          git push origin ${{ matrix.branch }} --force-with-lease
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Handle rebase conflicts
+        if: failure()
+        run: |
+          echo "Rebase conflict detected in branch ${{ matrix.branch }}"
+          git rebase --abort
+          exit 1
