@@ -15,7 +15,7 @@ jobs:
     outputs:
       branches: ${{ steps.generate-matrix.outputs.branches }}
     steps:
-      - name: Genrate matrix
+      - name: Generate matrix
         id: generate-matrix
         run: |
           branches=$(echo '"${{ inputs.branches }}"' | jq -c '. | split(" ") | map(select(length > 0))')
