@@ -38,5 +38,5 @@ jobs:
     if: always()
     steps:
       - name: Conditional exiting
-        if: needs.rebase.result == 'failure'
+        if: ${{ needs.rebase.result == 'failure' }}
         run: exit 1
