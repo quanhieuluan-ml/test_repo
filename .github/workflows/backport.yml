@@ -35,8 +35,7 @@ jobs:
   check-failures:
     runs-on: ubuntu-latest
     needs: rebase
-    if: always()
+    if: ${{ needs.rebase.result == 'failure' }}
     steps:
       - name: Conditional exiting
-        if: ${{ needs.rebase.result == 'failure' }}
         run: exit 1
