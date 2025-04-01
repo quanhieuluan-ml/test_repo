@@ -11,6 +11,7 @@ jobs:
         branch: [pre-dev1, pre-dev2]
     permissions:
       contents: write
+    continue-on-error: true
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v4
