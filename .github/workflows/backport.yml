@@ -10,7 +10,7 @@ on:
 
 jobs:
   rebase:
-    name: Rebase all predev branches
+    name: Rebase branch
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -22,30 +22,36 @@ jobs:
       overall: ${{ steps.job-output.outputs.OVERALL }}
     steps:
       - name: Check executable
+        id: check
         run: |
           INPUT_LIST="${{ inputs.exclude }}"
           IFS=',' read -ra VALUES <<< "$INPUT_LIST"
           for value in "${VALUES[@]}"; do
             if [[ "$value" == "${{ matrix.branch }}" ]]; then
+              echo "skip=true" >> $GITHUB_OUTPUT
               exit 0
             fi
           done
-      - run: exit 0
+
       - name: Checkout main branch
         uses: actions/checkout@v4
+        if: ${{ steps.check.outputs.skip != 'true' }}
         with:
           ref: main
           fetch-depth: 0
 
       - name: Checkout target branch
+        if: ${{ steps.check.outputs.skip != 'true' }}
         run: |
           git checkout ${{ matrix.branch }}
 
       - name: Rebase onto main
+        if: ${{ steps.check.outputs.skip != 'true' }}
         run: |
           git rebase origin/main
 
       - name: Push updated branch
+        if: ${{ steps.check.outputs.skip != 'true' }}
         run: |
           git push origin ${{ matrix.branch }} --force-with-lease
         env:
