@@ -3,9 +3,6 @@ name: Rebase pre-dev branches
 on:
   workflow_dispatch:
 
-env:
-  OVERALL: success
-
 jobs:
   rebase:
     runs-on: ubuntu-latest
@@ -15,6 +12,8 @@ jobs:
     permissions:
       contents: write
     continue-on-error: true
+    outputs:
+      overall: ${{ steps.job-output.outputs.OVERALL }}
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v4
@@ -36,10 +35,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Handle rebase conflicts
+      - name: Handle result
         if: failure()
+        id: job-output
         run: |
-          echo "OVERALL=failure" >> $GITHUB_ENV
+          echo "OVERALL=failure" >> $GITHUB_OUTPUT
           exit 1
   
   check-failures:
@@ -47,4 +47,6 @@ jobs:
     needs: rebase
     steps:
       - name: Conditional exiting
+        env:
+          OVERALL: ${{ needs.rebase.outputs.overall }}
         run: '[ "$OVERALL" = "failure" ] && exit 1'
