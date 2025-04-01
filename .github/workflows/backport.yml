@@ -17,6 +17,7 @@ jobs:
 
       - name: Pull latest changes
         run: |
+          git fetch --all
           git pull origin main
 
       - name: Checkout target branch
