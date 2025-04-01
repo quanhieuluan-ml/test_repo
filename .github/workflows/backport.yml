@@ -3,18 +3,30 @@ name: Rebase pre-dev branches
 on:
   workflow_dispatch:
     inputs:
-      exclude:
+      branches:
         type: string
-        required: false
-        description: Exclude branches. Input multiple with comma separation.
+        required: true
+        default: pre-dev1 pre-dev2 pre-dev3
+        description: Target branches with space separation.
 
 jobs:
+  init:
+    runs-on: ubuntu-latest
+    outputs:
+      branches: ${{ steps.generate-matrix.outputs.branches }}
+    steps:
+      - name: Genrate matrix
+        id: generate-matrix
+        run: |
+          branches=$(echo '"${{ inputs.branches }}"' | jq -c '. | split(" ") | map(select(length > 0))')
+          echo "branches=$branches" >> $GITHUB_OUTPUT
   rebase:
     name: Rebase branch
+    needs: init
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        branch: [pre-dev1, pre-dev2, pre-dev3]
+        branch: ${{ fromJSON(needs.init.outputs.branches) }}
     permissions:
       contents: write
     continue-on-error: true
