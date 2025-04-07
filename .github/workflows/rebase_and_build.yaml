@@ -1,0 +1,41 @@
+name: Deploy pre-dev
+on:
+  workflow_dispatch:
+    inputs:
+      predev:
+        description: "Predev name"
+        type: string
+        required: true
+     
+jobs:
+  rebase:
+    name: Rebase target branch
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ job.status }}
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Checkout target branch
+        run: |
+          git checkout ${{ inputs.predev }}
+
+      - name: Rebase onto main
+        run: |
+          git rebase origin/main
+
+      - name: Push updated branch
+        run: |
+          git push origin ${{ inputs.predev }} --force-with-lease
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    uses: ./.github/workflows/deploy_predev.yaml
+    needs: rebase
+    with:
+      predev: ${{ inputs.predev }}
