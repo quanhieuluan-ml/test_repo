@@ -18,6 +18,8 @@ jobs:
     outputs:
       branches: ${{ steps.generate-matrix.outputs.branches }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Generate matrix
         id: generate-matrix
         env:
