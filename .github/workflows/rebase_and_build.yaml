@@ -11,6 +11,8 @@ jobs:
   rebase:
     name: Rebase target branch
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     outputs:
       status: ${{ job.status }}
     steps:
