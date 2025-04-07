@@ -28,6 +28,7 @@ jobs:
           input_exclude_branches: ${{ inputs.exclude }}
           input_include_branches: ${{ inputs.include }}
         run: |
+          git fetch --all
           default_branches=$(git branch --list 'pre-dev*' | awk '{$1=$1};1' | jq -R . | jq -s .)
           exclude_branches=$(echo "$input_exclude_branches" | jq -R 'split(" ")')
           include_branches=$(echo "$input_include_branches" | jq -R 'split(" ")')
