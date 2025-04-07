@@ -3,6 +3,12 @@ on:
   push:
     branches:
       - pre-dev*
+  workflow_dispatch:
+    inputs:
+      predev:
+        description: "Predev name"
+        type: string
+        required: true
      
 jobs:
   notify:
