@@ -1,0 +1,12 @@
+name: Deploy pre-dev
+on:
+  push:
+    branches:
+      - pre-dev*
+     
+jobs:
+  notify:
+    name: Notify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
