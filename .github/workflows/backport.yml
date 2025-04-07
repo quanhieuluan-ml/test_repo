@@ -35,7 +35,7 @@ jobs:
           target_branches=$(echo "$default_branches" | jq --argjson remove_list "$exclude_branches" --argjson add_list "$include_branches" '
             . as $array |
             ($array | map(select(. as $item | $remove_list | index($item) | not))) + $add_list
-          ')
+          ' | jq -r @json)
           echo $default_branches
           echo $target_branches
           echo "branches=$target_branches" >> $GITHUB_OUTPUT
