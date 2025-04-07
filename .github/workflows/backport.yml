@@ -3,11 +3,14 @@ name: Rebase pre-dev branches
 on:
   workflow_dispatch:
     inputs:
-      branches:
+      exclude:
         type: string
-        required: true
-        default: pre-dev1 pre-dev2 pre-dev3
-        description: Target branches with space separation.
+        required: false
+        description: "Branches which should not be backported. Ex: pre-dev-dx1 pre-dev-mm1"
+      include:
+        type: string
+        required: false
+        description: "Branches which should also be backported too. Ex: pre-dev-dx1-edited pre-dev-mm1-custom"
 
 jobs:
   init:
@@ -17,9 +20,19 @@ jobs:
     steps:
       - name: Generate matrix
         id: generate-matrix
+        env:
+          input_exclude_branches: ${{ inputs.exclude }}
+          input_include_branches: ${{ inputs.include }}
         run: |
-          branches=$(echo '"${{ inputs.branches }}"' | jq -c '. | split(" ") | map(select(length > 0))')
-          echo "branches=$branches" >> $GITHUB_OUTPUT
+          default_branches=$(git branch --list 'pre-dev*' | awk '{$1=$1};1' | jq -R . | jq -s .)
+          exclude_branches=$(echo "$input_exclude_branches" | jq -R 'split(" ")')
+          include_branches=$(echo "$input_include_branches" | jq -R 'split(" ")')
+          target_branches=$(echo "$default_branches" | jq --argjson remove_list "$exclude_branches" --argjson add_list "$include_branches" '
+            . as $array |
+            ($array | map(select(. as $item | $remove_list | index($item) | not))) + $add_list
+          ')
+          echo "branches=$target_branches" >> $GITHUB_OUTPUT
+
   rebase:
     name: Rebase branch
     needs: init
@@ -33,37 +46,21 @@ jobs:
     outputs:
       overall: ${{ steps.job-output.outputs.OVERALL }}
     steps:
-      - name: Check executable
-        id: check
-        run: |
-          INPUT_LIST="${{ inputs.exclude }}"
-          IFS=',' read -ra VALUES <<< "$INPUT_LIST"
-          for value in "${VALUES[@]}"; do
-            if [[ "$value" == "${{ matrix.branch }}" ]]; then
-              echo "skip=true" >> $GITHUB_OUTPUT
-              exit 0
-            fi
-          done
-
       - name: Checkout main branch
         uses: actions/checkout@v4
-        if: ${{ steps.check.outputs.skip != 'true' }}
         with:
           ref: main
           fetch-depth: 0
 
       - name: Checkout target branch
-        if: ${{ steps.check.outputs.skip != 'true' }}
         run: |
           git checkout ${{ matrix.branch }}
 
       - name: Rebase onto main
-        if: ${{ steps.check.outputs.skip != 'true' }}
         run: |
           git rebase origin/main
 
       - name: Push updated branch
-        if: ${{ steps.check.outputs.skip != 'true' }}
         run: |
           git push origin ${{ matrix.branch }} --force-with-lease
         env:
