@@ -29,7 +29,7 @@ jobs:
           input_include_branches: ${{ inputs.include }}
         run: |
           git fetch --all
-          default_branches=$(git branch --list 'pre-dev*' | awk '{$1=$1};1' | jq -R . | jq -s .)
+          default_branches=$(git branch -r | sed 's/origin\///' | awk '{$1=$1};1' | grep '^pre-dev' | jq -R . | jq -s .)
           exclude_branches=$(echo "$input_exclude_branches" | jq -R 'split(" ")')
           include_branches=$(echo "$input_include_branches" | jq -R 'split(" ")')
           target_branches=$(echo "$default_branches" | jq --argjson remove_list "$exclude_branches" --argjson add_list "$include_branches" '
