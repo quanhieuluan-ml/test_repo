@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - pre-dev*
-  workflow_dispatch:
+  workflow_call:
     inputs:
       predev:
         description: "Predev name"
