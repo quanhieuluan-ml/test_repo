@@ -33,6 +33,8 @@ jobs:
             . as $array |
             ($array | map(select(. as $item | $remove_list | index($item) | not))) + $add_list
           ')
+          echo $default_branches
+          echo $target_branches
           echo "branches=$target_branches" >> $GITHUB_OUTPUT
 
   rebase:
